@@ -1,0 +1,9 @@
+{
+  "name": "Physics Force Lab",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "forwardPorts": [5173],
+  "portsAttributes": {
+    "5173": { "label": "Physics Force Lab", "onAutoForward": "openPreview" }
+  },
+  "postCreateCommand": "npm install"
+}
