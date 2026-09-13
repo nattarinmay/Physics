@@ -11,15 +11,29 @@
 - บันทึก XP/ผลการฝึกใน localStorage
 - Responsive สำหรับมือถือ/คอมพิวเตอร์
 
-## ใช้บน GitHub Codespaces
-Vite รองรับการรัน development server และ build สำหรับ production โดยใช้ `npm run dev` / `npm run build` ตามเอกสารทางการของ Vite
+## ใช้บน GitHub Codespaces (แนะนำ)
+โปรเจกต์นี้ตั้งค่าให้ Codespaces เป็นสภาพแวดล้อมหลัก โดยเซิร์ฟเวอร์จะ bind ที่ `0.0.0.0` และใช้พอร์ต `5500` ซึ่งถูก forward อัตโนมัติจาก `.devcontainer/devcontainer.json`
 
 ```bash
 npm install
 npm run dev
 ```
 
-ใน Codespaces ให้เปิดพอร์ต `5173` ที่ระบบ Forward Port ให้อัตโนมัติ หรือใช้ Ports > Open in Browser
+จากแท็บ **Ports** ให้เปิด `5500` ด้วย **Open in Browser** แล้วใช้ URL ที่ GitHub สร้างให้เป็น URL หลัก ห้ามใช้ `localhost` เมื่อต้องการให้เพื่อนเข้าจากอุปกรณ์อื่น
+
+เมื่อสร้างห้องแข่งขัน ระบบจะสร้าง QR จาก URL ของ forwarded port ปัจจุบันโดยอัตโนมัติ ผู้เล่นสามารถสแกน QR หรือเปิด URL แล้วกรอกชื่อเพื่อเข้าห้องได้ การเชื่อมต่อเกมใช้ WebSocket ที่ `/ws` และจะเปลี่ยนเป็น `wss://` อัตโนมัติเมื่อ Codespaces เปิดผ่าน HTTPS
+
+ถ้าพอร์ตถูกตั้งเป็น Private ให้เปลี่ยนเป็น **Public** ในแท็บ Ports ก่อนแชร์ QR ให้ผู้เล่นภายนอก Codespace
+
+## Deploy สำหรับใช้งานจริง
+แนะนำ **Render Web Service** เพราะเกมใช้ Node server และ WebSocket จึงไม่เหมาะกับ GitHub Pages แบบ static
+
+1. Push repository ขึ้น GitHub
+2. ใน Render เลือก **New > Blueprint** แล้วเลือก repository นี้
+3. Render จะอ่าน `render.yaml` และใช้ `npm install && npm run build` กับ `npm start` อัตโนมัติ
+4. ใช้ URL ของ Render เป็นลิงก์หลักสำหรับแชร์และสร้าง QR ห้องแข่งขัน
+
+ห้องแข่งขันเก็บใน memory ของ service ดังนั้นไม่ควร deploy แบบหลาย instance หากต้องการให้ผู้เล่นอยู่ในห้องเดียวกัน
 
 ## Build
 ```bash
@@ -35,10 +49,10 @@ npm run build
 
 ## Multiplayer
 เกมหลายคนต้องรัน Node server เพราะใช้ WebSocket:
-- เปิด Codespace/เครื่องเดียว
+- เปิด Codespace เดียวเป็นเครื่อง host
 - `npm run dev`
-- แชร์ URL ของ forwarded port ให้ผู้เล่น
-- ผู้เล่นสร้างห้อง → ส่ง Room Code → คนอื่น Join
+- เปิด forwarded URL จากแท็บ Ports
+- ผู้เล่นสร้างห้อง → กดแสดง QR Code → ให้คนอื่นสแกนและ Join
 - รองรับสูงสุด 10 คนในโค้ดตัวอย่าง
 
 ## หมายเหตุ

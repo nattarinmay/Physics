@@ -1,18 +1,15 @@
 import express from "express";
 import http from "http";
 import { WebSocketServer } from "ws";
-import path from "path";
-import { fileURLToPath } from "url";
 import { randomBytes } from "crypto";
+import { createServer as createViteServer } from "vite";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ server, path: "/ws" });
 const rooms = new Map();
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "..")));
 
 app.get("/api/health", (_, res) => res.json({ok:true, rooms: rooms.size}));
 
@@ -68,7 +65,7 @@ wss.on("connection", ws => {
       player.ready=!!m.ready;
       const all=[...room.players.values()];
       if (all.length>=2 && all.every(p=>p.ready)) {
-        room.started=true; room.status="playing"; room.round=0; room.answers=new Map(); questionFor(room);
+        room.started=true; room.startedAt=Date.now(); room.status="playing"; room.round=0; room.answers=new Map(); questionFor(room);
       }
       broadcast(room);
     }
@@ -103,5 +100,10 @@ const QUESTIONS = [
   {id:"mix2",topic:"ประยุกต์",text:"แรงแม่เหล็กจะมากที่สุดเมื่อมุมระหว่าง v และ B เป็นเท่าใด?",choices:["0°","30°","60°","90°"],answer:3}
 ];
 
-const port = process.env.PORT || 5173;
-server.listen(port, "0.0.0.0", () => console.log(`Physics Force Lab running on ${port}`));
+const port = Number(process.env.PORT || 5500);
+const vite = await createViteServer({
+  server: { middlewareMode: true, host: "0.0.0.0", port, hmr: { server } },
+  appType: "spa"
+});
+app.use(vite.middlewares);
+server.listen(port, "0.0.0.0", () => console.log(`Physics Force Lab running on http://0.0.0.0:${port}`));
