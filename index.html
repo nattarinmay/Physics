@@ -1,17 +1,1212 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#07111f" />
-  <meta name="description" content="Physics Force Lab เกมตอบคำถามฟิสิกส์เรื่องแรงทางไฟฟ้าและแรงแม่เหล็ก" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <title>Physics Force Lab | แรงทางไฟฟ้าและแรงแม่เหล็ก</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sci-Fashion Lab: สถาบันวิจัยข้ามเวลา</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            dark: '#0f172a',
+                            panel: '#1e293b',
+                            primary: '#8b5cf6',
+                            secondary: '#ec4899',
+                            cyan: '#06b6d4',
+                            accent: '#10b981',
+                            gold: '#f59e0b'
+                        }
+                    },
+                    fontFamily: {
+                        kanit: ['Kanit', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: radial-gradient(circle at top left, #1e1b4b, #0f172a, #090d16);
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8b5cf6;
+            border-radius: 4px;
+        }
+
+        /* Glassmorphism Effect */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Glow effects */
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+        }
+        .glow-pink {
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+        }
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Canvas background patterns */
+        .bg-grid-pattern {
+            background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Item Selection Animations */
+        .item-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .item-card:hover {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        /* HTML Canvas styles */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 99;
+        }
+    </style>
 </head>
-<body>
-  <div id="app"></div>
-  <script type="module" src="/src/main.js"></script>
+<body class="flex flex-col min-h-screen text-slate-100 selection:bg-pink-500 selection:text-white">
+
+    <!-- Sound FX & Confetti Canvas -->
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- Header Navigation -->
+    <header class="w-full glass-panel border-b border-slate-700/50 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-pink-500 to-cyan-400 flex items-center justify-center text-white shadow-lg glow-purple">
+                    <i class="fa-solid font-bold fa-atom text-xl animate-spin-slow"></i>
+                </div>
+                <div>
+                    <h1 class="font-outfit text-xl font-bold bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-400 bg-clip-text text-transparent">
+                        SCI-FASHION LAB
+                    </h1>
+                    <p class="text-xs text-slate-400 font-light">สถาบันวิจัยวิทยาศาสตร์ข้ามเวลา & แฟชั่นแล็บ</p>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="flex items-center space-x-4 text-sm">
+                <div class="glass-card px-3 py-1.5 rounded-full flex items-center space-x-2 border border-purple-500/30">
+                    <i class="fa-solid fa-star text-amber-400"></i>
+                    <span class="text-xs text-slate-300">คะแนน:</span>
+                    <span id="scoreDisplay" class="font-bold text-amber-300 font-outfit">0</span>
+                </div>
+                <div class="glass-card px-3 py-1.5 rounded-full flex items-center space-x-2 border border-cyan-500/30">
+                    <i class="fa-solid fa-shirt text-cyan-400"></i>
+                    <span class="text-xs text-slate-300">ชุดปลดล็อก:</span>
+                    <span id="unlockedCountDisplay" class="font-bold text-cyan-300 font-outfit">0/15</span>
+                </div>
+                <button id="audioToggleBtn" onclick="toggleAudio()" class="p-2 rounded-full glass-card hover:bg-slate-700 transition text-slate-300">
+                    <i id="audioIcon" class="fa-solid fa-volume-high text-cyan-400"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-3 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT COLUMN: Character Dressing Studio (5 cols) -->
+        <section class="lg:col-span-5 flex flex-col space-y-4">
+            <!-- Studio Card Container -->
+            <div class="glass-panel rounded-3xl p-4 flex flex-col items-center justify-between shadow-2xl relative overflow-hidden border border-purple-500/20 flex-1 min-h-[500px]">
+                
+                <!-- Background Scene Indicator -->
+                <div class="absolute top-4 left-4 z-10 glass-card px-3 py-1 rounded-full text-xs text-purple-300 flex items-center space-x-1.5 border border-purple-500/30">
+                    <i class="fa-solid fa-flask"></i>
+                    <span id="currentLabTitle">ห้องแล็บชีววิทยา</span>
+                </div>
+
+                <!-- Reset Outfit Button -->
+                <button onclick="resetOutfit()" class="absolute top-4 right-4 z-10 glass-card p-2 rounded-full text-xs text-slate-400 hover:text-white hover:bg-slate-700/80 transition" title="รีเซ็ตชุด">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </button>
+
+                <!-- Dynamic Vector Character Canvas Display -->
+                <div class="w-full h-full flex items-center justify-center relative py-6">
+                    <!-- SVG Character Container -->
+                    <div id="characterStage" class="w-full max-w-[320px] h-[440px] relative transition-all duration-500 flex items-center justify-center">
+                        <!-- Dynamic SVG Layers will be rendered here by JS -->
+                    </div>
+                </div>
+
+                <!-- Active Outfit Tags Bar -->
+                <div class="w-full glass-card rounded-2xl p-3 z-10 border border-slate-700/60">
+                    <p class="text-[11px] text-slate-400 mb-1.5 uppercase tracking-wider font-semibold">ชุดที่สวมใส่อยู่:</p>
+                    <div id="equippedTags" class="flex flex-wrap gap-1.5 min-h-[28px]">
+                        <!-- Dynamic Equipment Pills -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT COLUMN: Story Dialogue, Quiz & Wardrobe Tab System (7 cols) -->
+        <section class="lg:col-span-7 flex flex-col space-y-4">
+
+            <!-- Tab Buttons Header -->
+            <div class="flex space-x-2 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800">
+                <button id="tabQuizBtn" onclick="switchTab('quiz')" class="flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg">
+                    <i class="fa-solid fa-gamepad"></i>
+                    <span>ภารกิจ & ปริศนาเควสต์</span>
+                    <span id="questBadge" class="bg-pink-400 text-slate-950 font-bold text-[10px] px-2 py-0.5 rounded-full ml-1">ข้อ 1</span>
+                </button>
+                <button id="tabWardrobeBtn" onclick="switchTab('wardrobe')" class="flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/60">
+                    <i class="fa-solid fa-hat-wizard"></i>
+                    <span>ตู้เสื้อผ้า & ไอเทม</span>
+                </button>
+            </div>
+
+            <!-- TAB 1: STORY & QUIZ PANEL -->
+            <div id="quizPanel" class="glass-panel rounded-3xl p-5 md:p-6 flex-1 flex flex-col justify-between border border-pink-500/20 shadow-xl space-y-4">
+                
+                <!-- Story Dialogue Box -->
+                <div class="glass-card rounded-2xl p-4 border border-purple-500/30 relative">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex-shrink-0 flex items-center justify-center text-white border-2 border-pink-300 shadow-md">
+                            <i class="fa-solid fa-user-astronaut text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center mb-1">
+                                <h3 class="text-sm font-semibold text-pink-300 flex items-center gap-1.5">
+                                    <span>ดร.ไอริส (AI ผู้ช่วยกอบกู้แล็บ)</span>
+                                </h3>
+                                <span id="chapterBadge" class="text-[10px] bg-purple-950/80 text-purple-300 px-2 py-0.5 rounded-md border border-purple-800">Chapter 1</span>
+                            </div>
+                            <p id="storyText" class="text-slate-200 text-sm leading-relaxed font-light">
+                                "สวัสดีนักวิจัยรุ่นใหม่! สถาบันวิจัยข้ามเวลาของเรากำลังถูกมิติควอนตัมปั่นป่วน จนอุปกรณ์แล็บและชุดแฟชั่นสูญหายไปหมด! ช่วยฉันแก้ไขปริศนาวิทยาศาสตร์เพื่อปลดล็อกชุดแต่งตัวคืนมาหน่อยนะ!"
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question Card -->
+                <div id="questionContainer" class="flex-1 flex flex-col justify-center space-y-4 py-2">
+                    <div class="flex justify-between items-center">
+                        <span id="questionTopic" class="text-xs font-semibold uppercase tracking-widest text-cyan-400 bg-cyan-950/60 px-3 py-1 rounded-full border border-cyan-800/50">
+                            ชีววิทยา (Biology)
+                        </span>
+                        <span id="questionProgress" class="text-xs text-slate-400 font-outfit">คำถามที่ 1 จาก 5</span>
+                    </div>
+
+                    <h2 id="questionPrompt" class="text-base md:text-lg font-medium text-slate-100 leading-snug">
+                        โครงสร้างใดของเซลล์พืชที่เปรียบเสมือน "โรงงานผลิตพลังงาน" จากการสังเคราะห์ด้วยแสง?
+                    </h2>
+
+                    <!-- Answer Options -->
+                    <div id="optionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                        <!-- Options generated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Question Feedback Alert Banner -->
+                <div id="feedbackBanner" class="hidden rounded-2xl p-4 transition-all duration-300 flex items-start space-x-3">
+                    <i id="feedbackIcon" class="fa-solid text-xl mt-0.5"></i>
+                    <div>
+                        <h4 id="feedbackTitle" class="font-semibold text-sm"></h4>
+                        <p id="feedbackText" class="text-xs mt-0.5 leading-relaxed opacity-90"></p>
+                    </div>
+                </div>
+
+                <!-- Navigation Action Footer -->
+                <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
+                    <span class="text-xs text-slate-400 flex items-center space-x-1">
+                        <i class="fa-solid fa-gift text-pink-400"></i>
+                        <span id="rewardPreviewText">รางวัล: เสื้อกาวน์ไฮเทค + ทรงผมไซเบอร์</span>
+                    </span>
+                    <button id="nextBtn" onclick="nextQuestion()" disabled class="px-5 py-2.5 rounded-xl font-medium text-sm bg-slate-800 text-slate-500 cursor-not-allowed transition-all duration-300 flex items-center space-x-2">
+                        <span>ข้อถัดไป</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 2: WARDROBE STUDIO PANEL -->
+            <div id="wardrobePanel" class="hidden glass-panel rounded-3xl p-5 md:p-6 flex-1 flex-col justify-between border border-cyan-500/20 shadow-xl space-y-4">
+                
+                <!-- Category Filter Tabs -->
+                <div class="flex space-x-1 overflow-x-auto pb-2 scrollbar-none" id="categoryFilterContainer">
+                    <button onclick="filterCategory('hair')" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap bg-purple-600 text-white transition">
+                        <i class="fa-solid fa-user text-xs mr-1"></i>ทรงผม
+                    </button>
+                    <button onclick="filterCategory('top')" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-400 hover:text-white transition">
+                        <i class="fa-solid fa-shirt text-xs mr-1"></i>เสื้อ
+                    </button>
+                    <button onclick="filterCategory('bottom')" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-400 hover:text-white transition">
+                        <i class="fa-solid fa-ring text-xs mr-1"></i>กางเกง/กระโปรง
+                    </button>
+                    <button onclick="filterCategory('gear')" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-400 hover:text-white transition">
+                        <i class="fa-solid fa-glasses text-xs mr-1"></i>อุปกรณ์แล็บ
+                    </button>
+                    <button onclick="filterCategory('shoes')" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-400 hover:text-white transition">
+                        <i class="fa-solid fa-shoe-prints text-xs mr-1"></i>รองเท้า
+                    </button>
+                    <button onclick="filterCategory('bg')" class="cat-btn px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-400 hover:text-white transition">
+                        <i class="fa-solid fa-image text-xs mr-1"></i>ฉากหลัง
+                    </button>
+                </div>
+
+                <!-- Wardrobe Items Grid -->
+                <div id="wardrobeGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 flex-1 overflow-y-auto max-h-[360px] p-1">
+                    <!-- Wardrobe item cards populated by JS -->
+                </div>
+
+                <div class="glass-card rounded-2xl p-3 flex justify-between items-center text-xs text-slate-400">
+                    <span class="flex items-center space-x-1.5">
+                        <i class="fa-solid fa-circle-info text-cyan-400"></i>
+                        <span>ตอบคำถามวิทยาศาสตร์ในแท็บภารกิจเพื่อปลดล็อกไอเทมใหม่ๆ</span>
+                    </span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FINAL COMPLETION MODAL -->
+    <div id="completionModal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="glass-panel max-w-2xl w-full rounded-3xl border border-pink-500/40 p-6 md:p-8 flex flex-col items-center text-center relative overflow-hidden shadow-2xl animate-fade-in">
+            <!-- Modal Ambient Glow -->
+            <div class="absolute -top-24 -left-24 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl"></div>
+
+            <div class="w-16 h-16 bg-gradient-to-tr from-amber-400 to-pink-500 rounded-2xl flex items-center justify-center text-white text-3xl mb-4 shadow-lg glow-pink">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+
+            <h2 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-amber-300 via-pink-400 to-cyan-300 bg-clip-text text-transparent">
+                กอบกู้แฟชั่นแล็บสำเร็จ!
+            </h2>
+            <p class="text-slate-300 text-sm mt-1 mb-6">คุณได้แก้ไขปริศนาวิทยาศาสตร์ข้ามเวลาและออกแบบสไตล์สุดคูล!</p>
+
+            <!-- Final Result Box -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-6">
+                <!-- Avatar Preview Thumbnail -->
+                <div class="glass-card p-4 rounded-2xl flex flex-col items-center justify-center border border-purple-500/30">
+                    <div id="finalAvatarPreview" class="w-48 h-56 flex items-center justify-center">
+                        <!-- SVG Clone -->
+                    </div>
+                </div>
+
+                <!-- Stats & Title Earned -->
+                <div class="flex flex-col justify-center space-y-3 text-left glass-card p-4 rounded-2xl border border-slate-700/60">
+                    <div>
+                        <span class="text-xs text-slate-400 uppercase tracking-wider">ฉายาที่ได้รับ</span>
+                        <h4 id="earnedTitle" class="text-lg font-bold text-cyan-300">Cyber Scientist Stylist</h4>
+                    </div>
+                    <div class="border-t border-slate-700/50 pt-2">
+                        <span class="text-xs text-slate-400 uppercase tracking-wider">คะแนนรวม</span>
+                        <p id="finalScore" class="text-2xl font-bold text-amber-400 font-outfit">500 / 500</p>
+                    </div>
+                    <div class="border-t border-slate-700/50 pt-2">
+                        <span class="text-xs text-slate-400 uppercase tracking-wider">ไอเทมสะสมครบ</span>
+                        <p id="finalItemPercent" class="text-sm font-semibold text-pink-300">100% ปลดล็อกทั้งหมด</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="flex flex-wrap gap-3 w-full justify-center">
+                <button onclick="downloadSnapshot()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium text-sm shadow-lg hover:brightness-110 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>บันทึกรูปตัวละคร</span>
+                </button>
+                <button onclick="restartGame()" class="px-6 py-3 rounded-xl bg-slate-800 text-slate-200 border border-slate-700 font-medium text-sm hover:bg-slate-700 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>เล่นอีกครั้ง</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ------------------------------------------------------------------------
+         * 1. AUDIO SYNTHESIZER (Web Audio API - No external sound files needed)
+         * ------------------------------------------------------------------------ */
+        let audioCtx = null;
+        let isAudioMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (isAudioMuted) return;
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'correct') {
+                // Happy major arpeggio
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, index) => {
+                    const noteOsc = audioCtx.createOscillator();
+                    const noteGain = audioCtx.createGain();
+                    noteOsc.type = 'triangle';
+                    noteOsc.frequency.setValueAtTime(freq, now + index * 0.08);
+                    noteGain.gain.setValueAtTime(0.15, now + index * 0.08);
+                    noteGain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.08 + 0.25);
+                    noteOsc.connect(noteGain);
+                    noteGain.connect(audioCtx.destination);
+                    noteOsc.start(now + index * 0.08);
+                    noteOsc.stop(now + index * 0.08 + 0.25);
+                });
+            } else if (type === 'wrong') {
+                // Buzz synth sound
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(90, now + 0.25);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'unlock') {
+                // Sparkle chime
+                const freqs = [880, 1108.73, 1318.51, 1760];
+                freqs.forEach((freq, i) => {
+                    const sparkOsc = audioCtx.createOscillator();
+                    const sparkGain = audioCtx.createGain();
+                    sparkOsc.type = 'sine';
+                    sparkOsc.frequency.setValueAtTime(freq, now + i * 0.06);
+                    sparkGain.gain.setValueAtTime(0.1, now + i * 0.06);
+                    sparkGain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.3);
+                    sparkOsc.connect(sparkGain);
+                    sparkGain.connect(audioCtx.destination);
+                    sparkOsc.start(now + i * 0.06);
+                    sparkOsc.stop(now + i * 0.06 + 0.3);
+                });
+            }
+        }
+
+        function toggleAudio() {
+            isAudioMuted = !isAudioMuted;
+            const icon = document.getElementById('audioIcon');
+            if (isAudioMuted) {
+                icon.className = 'fa-solid fa-volume-xmark text-slate-500';
+            } else {
+                icon.className = 'fa-solid fa-volume-high text-cyan-400';
+                playSound('click');
+            }
+        }
+
+        /* ------------------------------------------------------------------------
+         * 2. SCIENCE QUIZ DATASET & STORY NARRATIVE
+         * ------------------------------------------------------------------------ */
+        const quizData = [
+            {
+                chapter: "Chapter 1: ห้องแล็บชีววิทยา",
+                labTitle: "ห้องแล็บชีววิทยา (Biology Lab)",
+                topic: "ชีววิทยา (Biology)",
+                story: "ยินดีต้อนรับสู่แล็บพฤกษศาสตร์ควอนตัม! ตอนนี้พืชทดลองกำลังขาดพลังงาน ช่วยเราหาความรู้เรื่องการสังเคราะห์ด้วยแสงเพื่อเปิดเครื่องกำเนิดพลังงานชีวภาพเร็ว!",
+                question: "โครงสร้างออร์กาเนลล์ใดในเซลล์พืชที่เป็นแหล่งเกิดกระบวนการสังเคราะห์ด้วยแสง (Photosynthesis)?",
+                options: [
+                    { text: "ไมโทคอนเดรีย (Mitochondria)", correct: false },
+                    { text: "คลอโรพลาสต์ (Chloroplast)", correct: true },
+                    { text: "ไรโบโซม (Ribosome)", correct: false },
+                    { text: "กอลจิบอดี (Golgi Body)", correct: false }
+                ],
+                explanation: "ถูกถูกต้อง! คลอโรพลาสต์ มีสารสีคลอโรฟิลล์ทำหน้าที่ดูดกลืนพลังงานแสงเพื่อเปลี่ยน CO2 และน้ำ ให้เป็นน้ำตาลและออกซิเจน!",
+                unlockItemId: "top_labcoat",
+                rewardName: "เสื้อกาวน์นักวิจัยไฮเทค"
+            },
+            {
+                chapter: "Chapter 2: ธาตุและพันธะเคมี",
+                labTitle: "ห้องแล็บเคมีประยุกต์ (Chemistry Lab)",
+                topic: "เคมี (Chemistry)",
+                story: "พวกเรามาถึงมิติห้องแล็บเคมีแล้ว! ประตูมิติถูกล็อคด้วยรหัสผ่านพันธะเคมี จงไขปริศนาเรื่องตารางธาตุเพื่อรับสิทธิ์เปิดคลังเครื่องแต่งกาย!",
+                question: "ธาตุที่มีเลขอะตอม 6 ในตารางธาตุ ซึ่งเป็นธาตุหลักในสารประกอบอินทรีย์ของสิ่งมีชีวิตทั้งหมดคือธาตุใด?",
+                options: [
+                    { text: "ไนโตรเจน (N)", correct: false },
+                    { text: "ออกซิเจน (O)", correct: false },
+                    { text: "คาร์บอน (C)", correct: true },
+                    { text: "ไฮโดรเจน (H)", correct: false }
+                ],
+                explanation: "เก่งมาก! คาร์บอน (Carbon) มีเลขอะตอม 6 สามารถเกิดพันธะโคเวเลนต์ได้ถึง 4 พันธะ จึงเป็นโครงสร้างหลักของสารชีวโมเลกุล!",
+                unlockItemId: "gear:goggles",
+                rewardName: "แว่นตานิรภัยไซเบอร์ (Lab Goggles)"
+            },
+            {
+                chapter: "Chapter 3: กลศาสตร์ & การเคลื่อนที่",
+                labTitle: "ห้องแล็บฟิสิกส์พลังงาน (Physics Lab)",
+                topic: "ฟิสิกส์ (Physics)",
+                story: "ระบบแรงโน้มถ่วงจำลองเกิดขัดข้อง! ของในแล็บลอยวุ่นวายไปหมด! เราต้องคำนวณกฎการเคลื่อนที่ของนิวตันเพื่อปรับความสมดุลให้แล็บฟิสิกส์!",
+                question: "ตามกฎข้อที่ 2 ของนิวตัน (Newton's Second Law) ความสัมพันธ์ระหว่าง แรง (F), มวล (m) และ ความเร่ง (a) คือข้อใด?",
+                options: [
+                    { text: "F = m / a", correct: false },
+                    { text: "F = m × a", correct: true },
+                    { text: "F = m + a", correct: false },
+                    { text: "F = a / m", correct: false }
+                ],
+                explanation: "ถูกต้องสมบูรณ์! กฎข้อที่ 2 ของนิวตันระบุว่า F = ma (แรงลัพธ์เท่ากับมวลคูณความเร่ง) เมื่อมีแรงลัพธ์มากระทำ วัตถุจะเคลื่อนที่ด้วยความเร่ง!",
+                unlockItemId: "hair_twin",
+                rewardName: "ทรงผมทวินเทลนีออน"
+            },
+            {
+                chapter: "Chapter 4: ดาราศาสตร์ & จักรวาล",
+                labTitle: "หอดูดาวและควอนตัม (Observatory)",
+                topic: "โลกและอวกาศ (Astronomy)",
+                story: "เราทะลุมิติมายังหอดูดาวอวกาศ! ดาวฤกษ์ตรงหน้ากำลังจะวิวัฒนาการ จงวิเคราะห์สีของดาวเพื่อบอกอุณหภูมิพื้นผิวของมัน!",
+                question: "ดาวฤกษ์ที่มีอุณหภูมิผิวสูงที่สุดจะมีสีใดตามหลักสเปกตรัมของดาวฤกษ์?",
+                options: [
+                    { text: "สีแดง (Red)", correct: false },
+                    { text: "สีเหลือง (Yellow)", correct: false },
+                    { text: "สีน้ำเงิน / ฟ้า (Blue)", correct: true },
+                    { text: "สีส้ม (Orange)", correct: false }
+                ],
+                explanation: "ถูกต้อง! ดาวฤกษ์สีน้ำเงิน (Blue Stars) มีอุณหภูมิผิวสูงที่สุด (มากกว่า 10,000 - 30,000 Kelvin) ส่วนดาวสีแดงจะมีอุณหภูมิต่ำที่สุด!",
+                unlockItemId: "bg_space",
+                rewardName: "ฉากหลังกาแล็กซีควอนตัม"
+            },
+            {
+                chapter: "Chapter 5: รหัสพันธุกรรม DNA",
+                labTitle: "ห้องแล็บพันธุศาสตร์ (Genetics Lab)",
+                topic: "พันธุศาสตร์ (Genetics)",
+                story: "ภารกิจสุดท้าย! เราต้องปลดรหัสพันธุกรรมควอนตัมเพื่อเติมเต็มแฟชั่นแล็บให้สมบูรณ์แบบ 100%! จงระบุคู่เบสที่ถูกต้องใน DNA!",
+                question: "ในสายดีเอ็นเอ (DNA) เบสอะดีนีน (A : Adenine) จะจับคู่กับเบสชนิดใดด้วยพันธะไฮโดรเจน?",
+                options: [
+                    { text: "ไทมีน (T : Thymine)", correct: true },
+                    { text: "ไซโทซีน (C : Cytosine)", correct: false },
+                    { text: "กวานีน (G : Guanine)", correct: false },
+                    { text: "ยูราซิล (U : Uracil)", correct: false }
+                ],
+                explanation: "ถูกต้องที่สุด! ใน DNA เบส A จะจับคู่กับ T (Adenine - Thymine) ด้วยพันธะไฮโดรเจนคู่ และ C จะจับคู่กับ G (Cytosine - Guanine) ด้วยพันธะสาม!",
+                unlockItemId: "gear:flask",
+                rewardName: "ขวดทดลองสารเคมีเรืองแสง (Lab Flask)"
+            }
+        ];
+
+        /* ------------------------------------------------------------------------
+         * 3. WARDROBE DATA & CHARACTER STATE
+         * ------------------------------------------------------------------------ */
+        const wardrobeDatabase = [
+            // HAIR
+            { id: 'hair_default', category: 'hair', name: 'ผมบ๊อบสั้นสีน้ำตาล', icon: 'fa-user', unlocked: true },
+            { id: 'hair_twin', category: 'hair', name: 'ทวินเทลไซเบอร์ชมพู', icon: 'fa-wand-magic-sparkles', unlocked: false, unlockReq: 'ตอบคำถามข้อ 3 ถูก' },
+            { id: 'hair_long', category: 'hair', name: 'ผมยาวตรงสีฟ้าควอนตัม', icon: 'fa-sparkles', unlocked: true },
+
+            // TOPS
+            { id: 'top_casual', category: 'top', name: 'เสื้อยืด Sci-Fi สีกรม', icon: 'fa-shirt', unlocked: true },
+            { id: 'top_labcoat', category: 'top', name: 'เสื้อกาวน์นักวิจัยไฮเทค', icon: 'fa-user-doctor', unlocked: false, unlockReq: 'ตอบคำถามข้อ 1 ถูก' },
+            { id: 'top_cyber', category: 'top', name: 'เสื้อฮู้ดเน็ตทูเนียร์', icon: 'fa-vest', unlocked: true },
+
+            // BOTTOMS
+            { id: 'bottom_skirt', category: 'bottom', name: 'กระโปรงเทนนิสสีขาว', icon: 'fa-ring', unlocked: true },
+            { id: 'bottom_pants', category: 'bottom', name: 'กางเกงขายาวสตรีทไซเบอร์', icon: 'fa-mars-stroke', unlocked: true },
+            { id: 'bottom_shorts', category: 'bottom', name: 'กางเกงขาสั้นสีดำ', icon: 'fa-grip-lines', unlocked: false, unlockReq: 'ตอบคำถามข้อ 2 ถูก' },
+
+            // GEAR & ACCESSORIES
+            { id: 'gear:goggles', category: 'gear', name: 'แว่นตานิรภัยแล็บ (Goggles)', icon: 'fa-glasses', unlocked: false, unlockReq: 'ตอบคำถามข้อ 2 ถูก' },
+            { id: 'gear:flask', category: 'gear', name: 'ขวดทดลองสารเคมีเรืองแสง', icon: 'fa-flask', unlocked: false, unlockReq: 'ตอบคำถามข้อ 5 ถูก' },
+            { id: 'gear:headphones', category: 'gear', name: 'หูฟังคิตตี้ไซเบอร์', icon: 'fa-headphones', unlocked: true },
+
+            // SHOES
+            { id: 'shoes_sneakers', category: 'shoes', name: 'รองเท้าผ้าใบสีขาว-ชมพู', icon: 'fa-shoe-prints', unlocked: true },
+            { id: 'shoes_boots', category: 'shoes', name: 'รองเท้าบูทไซเบอร์', icon: 'fa-socks', unlocked: false, unlockReq: 'ตอบคำถามข้อ 4 ถูก' },
+
+            // BACKGROUNDS
+            { id: 'bg_lab', category: 'bg', name: 'ห้องแล็บพฤกษศาสตร์', icon: 'fa-microscope', unlocked: true },
+            { id: 'bg_space', category: 'bg', name: 'อวกาศ & กาแล็กซี', icon: 'fa-atom', unlocked: false, unlockReq: 'ตอบคำถามข้อ 4 ถูก' }
+        ];
+
+        // Active Player Character State
+        let characterState = {
+            hair: 'hair_default',
+            top: 'top_casual',
+            bottom: 'bottom_skirt',
+            shoes: 'shoes_sneakers',
+            gear: ['gear:headphones'],
+            bg: 'bg_lab'
+        };
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let activeTab = 'quiz';
+        let activeCategory = 'hair';
+        let answeredQuestions = new Set();
+
+        /* ------------------------------------------------------------------------
+         * 4. SVG CHARACTER DOLL LAYER RENDERER
+         * ------------------------------------------------------------------------ */
+        function renderCharacterSVG() {
+            const container = document.getElementById('characterStage');
+            
+            // Define Background Colors
+            let bgColor1 = "#1e1b4b";
+            let bgColor2 = "#0f172a";
+            if (characterState.bg === 'bg_space') {
+                bgColor1 = "#090d16";
+                bgColor2 = "#2e1065";
+            }
+
+            // Define Hair Colors & Styles
+            let hairSVG = '';
+            if (characterState.hair === 'hair_default') {
+                hairSVG = `
+                    <path d="M 100,100 C 90,60 170,60 160,100 C 175,120 170,160 165,180 C 155,160 155,140 155,130 C 145,130 115,130 105,130 C 105,140 105,160 95,180 C 90,160 85,120 100,100 Z" fill="#7c2d12"/>
+                    <path d="M 100,100 C 110,80 150,80 160,100 C 150,110 110,110 100,100 Z" fill="#9a3412"/>
+                `;
+            } else if (characterState.hair === 'hair_twin') {
+                hairSVG = `
+                    <!-- Twintails -->
+                    <path d="M 95,110 Q 60,130 50,190 Q 75,170 100,130 Z" fill="#ec4899"/>
+                    <path d="M 165,110 Q 200,130 210,190 Q 185,170 160,130 Z" fill="#ec4899"/>
+                    <!-- Main Hair -->
+                    <path d="M 100,100 C 90,65 170,65 160,100 C 165,125 155,135 155,130 C 140,120 120,120 105,130 C 95,135 95,125 100,100 Z" fill="#f472b6"/>
+                    <!-- Bangs -->
+                    <path d="M 105,100 Q 130,115 155,100 Q 130,90 105,100 Z" fill="#fbcfe8"/>
+                `;
+            } else if (characterState.hair === 'hair_long') {
+                hairSVG = `
+                    <path d="M 90,100 C 80,140 85,240 85,260 Q 100,240 100,150 L 160,150 Q 160,240 175,260 C 175,240 180,140 170,100 C 170,60 90,60 90,100 Z" fill="#0284c7"/>
+                    <path d="M 100,100 Q 130,120 160,100 Q 130,85 100,100 Z" fill="#38bdf8"/>
+                `;
+            }
+
+            // Tops Layers
+            let topSVG = '';
+            if (characterState.top === 'top_casual') {
+                topSVG = `
+                    <path d="M 112,190 L 148,190 L 155,250 L 105,250 Z" fill="#1e293b"/>
+                    <path d="M 112,190 L 95,215 L 110,225 L 118,205 Z" fill="#334155"/>
+                    <path d="M 148,190 L 165,215 L 150,225 L 142,205 Z" fill="#334155"/>
+                    <circle cx="130" cy="220" r="10" fill="#ec4899"/>
+                    <path d="M 125,220 L 135,220 M 130,215 L 130,225" stroke="#ffffff" stroke-width="2"/>
+                `;
+            } else if (characterState.top === 'top_labcoat') {
+                topSVG = `
+                    <!-- Base Shirt -->
+                    <path d="M 118,190 L 142,190 L 145,250 L 115,250 Z" fill="#06b6d4"/>
+                    <!-- Open Lab Coat -->
+                    <path d="M 112,190 L 90,210 L 95,280 L 120,280 L 118,200 Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+                    <path d="M 148,190 L 170,210 L 165,280 L 140,280 L 142,200 Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+                    <!-- Lapels -->
+                    <path d="M 112,190 L 125,220 L 115,220 Z" fill="#e2e8f0"/>
+                    <path d="M 148,190 L 135,220 L 145,220 Z" fill="#e2e8f0"/>
+                    <!-- Pocket Badge -->
+                    <rect x="100" y="235" width="12" height="15" rx="2" fill="#8b5cf6"/>
+                `;
+            } else if (characterState.top === 'top_cyber') {
+                topSVG = `
+                    <path d="M 108,190 L 152,190 L 158,255 L 102,255 Z" fill="#581c87"/>
+                    <path d="M 108,190 L 88,225 L 102,232 L 114,205 Z" fill="#7e22ce"/>
+                    <path d="M 152,190 L 172,225 L 158,232 L 146,205 Z" fill="#7e22ce"/>
+                    <!-- Neon accents -->
+                    <line x1="110" y1="240" x2="150" y2="240" stroke="#a855f7" stroke-width="3"/>
+                    <line x1="130" y1="195" x2="130" y2="255" stroke="#06b6d4" stroke-width="2"/>
+                `;
+            }
+
+            // Bottoms Layers
+            let bottomSVG = '';
+            if (characterState.bottom === 'bottom_skirt') {
+                bottomSVG = `
+                    <path d="M 105,250 L 155,250 L 165,290 L 95,290 Z" fill="#f1f5f9"/>
+                    <!-- Pleats -->
+                    <line x1="115" y1="250" x2="110" y2="290" stroke="#cbd5e1" stroke-width="1.5"/>
+                    <line x1="130" y1="250" x2="130" y2="290" stroke="#cbd5e1" stroke-width="1.5"/>
+                    <line x1="145" y1="250" x2="150" y2="290" stroke="#cbd5e1" stroke-width="1.5"/>
+                `;
+            } else if (characterState.bottom === 'bottom_pants') {
+                bottomSVG = `
+                    <path d="M 105,250 L 155,250 L 158,360 L 133,360 L 130,280 L 127,280 L 102,360 L 97,360 Z" fill="#0f172a"/>
+                    <!-- Neon Stripe -->
+                    <line x1="103" y1="255" x2="99" y2="355" stroke="#ec4899" stroke-width="2"/>
+                    <line x1="157" y1="255" x2="161" y2="355" stroke="#ec4899" stroke-width="2"/>
+                `;
+            } else if (characterState.bottom === 'bottom_shorts') {
+                bottomSVG = `
+                    <path d="M 105,250 L 155,250 L 158,285 L 132,285 L 130,270 L 128,270 L 102,285 L 97,285 Z" fill="#334155"/>
+                `;
+            }
+
+            // Shoes Layers
+            let shoesSVG = '';
+            if (characterState.shoes === 'shoes_sneakers') {
+                shoesSVG = `
+                    <!-- Left Sneaker -->
+                    <ellipse cx="112" cy="370" rx="14" ry="7" fill="#ffffff"/>
+                    <path d="M 98,370 C 98,360 112,360 120,365 L 124,372 L 98,372 Z" fill="#ec4899"/>
+                    <!-- Right Sneaker -->
+                    <ellipse cx="148" cy="370" rx="14" ry="7" fill="#ffffff"/>
+                    <path d="M 134,370 C 134,360 148,360 156,365 L 160,372 L 134,372 Z" fill="#ec4899"/>
+                `;
+            } else if (characterState.shoes === 'shoes_boots') {
+                shoesSVG = `
+                    <!-- Left Boot -->
+                    <path d="M 104,330 L 120,330 L 122,374 L 96,374 L 96,365 Z" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1"/>
+                    <!-- Right Boot -->
+                    <path d="M 140,330 L 156,330 L 164,365 L 164,374 L 138,374 Z" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1"/>
+                `;
+            }
+
+            // Accessories Layers
+            let gearSVG = '';
+            if (characterState.gear.includes('gear:goggles')) {
+                gearSVG += `
+                    <!-- Lab Goggles on Head -->
+                    <rect x="102" y="98" width="56" height="20" rx="8" fill="rgba(6, 182, 212, 0.7)" stroke="#06b6d4" stroke-width="2"/>
+                    <circle cx="116" cy="108" r="7" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+                    <circle cx="144" cy="108" r="7" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+                    <line x1="90" y1="108" x2="102" y2="108" stroke="#1e293b" stroke-width="3"/>
+                    <line x1="158" y1="108" x2="170" y2="108" stroke="#1e293b" stroke-width="3"/>
+                `;
+            }
+            if (characterState.gear.includes('gear:headphones')) {
+                gearSVG += `
+                    <!-- Headphones -->
+                    <path d="M 90,120 A 42,42 0 0,1 170,120" fill="none" stroke="#ec4899" stroke-width="4"/>
+                    <rect x="84" y="112" width="10" height="20" rx="4" fill="#f472b6"/>
+                    <rect x="166" y="112" width="10" height="20" rx="4" fill="#f472b6"/>
+                    <!-- Cat Ears -->
+                    <polygon points="94,84 84,65 106,75" fill="#ec4899"/>
+                    <polygon points="166,84 176,65 154,75" fill="#ec4899"/>
+                `;
+            }
+            if (characterState.gear.includes('gear:flask')) {
+                gearSVG += `
+                    <!-- Chemical Flask in Hand -->
+                    <g transform="translate(170, 230)">
+                        <path d="M 12,0 L 18,0 L 18,12 L 26,26 A 4,4 0 0,1 22,32 L 8,32 A 4,4 0 0,1 4,26 L 12,12 Z" fill="rgba(16, 185, 129, 0.8)" stroke="#10b981" stroke-width="1.5"/>
+                        <path d="M 6,24 Q 15,20 24,24 L 22,30 L 8,30 Z" fill="#34d399"/>
+                        <!-- Bubbles -->
+                        <circle cx="15" cy="16" r="1.5" fill="#ffffff"/>
+                        <circle cx="12" cy="8" r="1" fill="#ffffff"/>
+                    </g>
+                `;
+            }
+
+            // Construct Full SVG
+            const fullSVG = `
+                <svg viewBox="0 0 260 420" class="w-full h-full drop-shadow-2xl">
+                    <defs>
+                        <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="${bgColor1}" />
+                            <stop offset="100%" stop-color="${bgColor2}" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Background Container -->
+                    <rect width="260" height="420" rx="24" fill="url(#bgGrad)"/>
+                    
+                    ${characterState.bg === 'bg_space' ? `
+                        <!-- Stars & Nebula Effects -->
+                        <circle cx="40" cy="50" r="1.5" fill="#fff" opacity="0.8"/>
+                        <circle cx="210" cy="80" r="2" fill="#38bdf8" opacity="0.9"/>
+                        <circle cx="190" cy="340" r="1.5" fill="#f472b6" opacity="0.7"/>
+                        <circle cx="50" cy="300" r="1" fill="#fff" opacity="0.6"/>
+                    ` : `
+                        <!-- Lab Grid Lines -->
+                        <line x1="0" y1="360" x2="260" y2="360" stroke="#334155" stroke-width="1"/>
+                        <line x1="30" y1="0" x2="30" y2="420" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+                        <line x1="230" y1="0" x2="230" y2="420" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+                    `}
+
+                    <!-- Character Base Body Structure -->
+                    <!-- Legs -->
+                    <rect x="110" y="280" width="12" height="90" rx="6" fill="#fbcfe8"/>
+                    <rect x="138" y="280" width="12" height="90" rx="6" fill="#fbcfe8"/>
+
+                    <!-- Shoes Layer -->
+                    ${shoesSVG}
+
+                    <!-- Bottoms Layer -->
+                    ${bottomSVG}
+
+                    <!-- Torso & Arms -->
+                    <rect x="112" y="180" width="36" height="75" rx="10" fill="#fbcfe8"/>
+                    <!-- Arms -->
+                    <path d="M 112,190 L 92,250" stroke="#fbcfe8" stroke-width="10" stroke-linecap="round"/>
+                    <path d="M 148,190 L 168,250" stroke="#fbcfe8" stroke-width="10" stroke-linecap="round"/>
+
+                    <!-- Tops Layer -->
+                    ${topSVG}
+
+                    <!-- Head & Neck -->
+                    <rect x="124" y="155" width="12" height="25" fill="#fbcfe8"/>
+                    <ellipse cx="130" cy="125" rx="30" ry="35" fill="#fbcfe8"/>
+
+                    <!-- Face Details (Anime Style Eyes & Smile) -->
+                    <!-- Eyes -->
+                    <ellipse cx="118" cy="124" rx="4.5" ry="6.5" fill="#0f172a"/>
+                    <ellipse cx="142" cy="124" rx="4.5" ry="6.5" fill="#0f172a"/>
+                    <circle cx="119.5" cy="122" r="1.8" fill="#ffffff"/>
+                    <circle cx="143.5" cy="122" r="1.8" fill="#ffffff"/>
+                    <!-- Eyebrows & Cheeks -->
+                    <path d="M 112,114 Q 118,111 124,114" stroke="#7c2d12" stroke-width="1.5" fill="none"/>
+                    <path d="M 136,114 Q 142,111 148,114" stroke="#7c2d12" stroke-width="1.5" fill="none"/>
+                    <ellipse cx="112" cy="132" rx="4" ry="2" fill="#f472b6" opacity="0.6"/>
+                    <ellipse cx="148" cy="132" rx="4" ry="2" fill="#f472b6" opacity="0.6"/>
+                    <!-- Smile -->
+                    <path d="M 126,136 Q 130,141 134,136" stroke="#9a3412" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+                    <!-- Hair Layer -->
+                    ${hairSVG}
+
+                    <!-- Gear & Lab Equipment Layer -->
+                    ${gearSVG}
+                </svg>
+            `;
+
+            container.innerHTML = fullSVG;
+            updateEquippedTags();
+        }
+
+        // Update list of currently equipped item tags beneath character
+        function updateEquippedTags() {
+            const container = document.getElementById('equippedTags');
+            container.innerHTML = '';
+
+            const activeItems = [];
+            // Find names
+            Object.keys(characterState).forEach(cat => {
+                if (cat === 'gear') {
+                    characterState.gear.forEach(gid => {
+                        const item = wardrobeDatabase.find(i => i.id === gid);
+                        if (item) activeItems.push(item);
+                    });
+                } else {
+                    const item = wardrobeDatabase.find(i => i.id === characterState[cat]);
+                    if (item) activeItems.push(item);
+                }
+            });
+
+            activeItems.forEach(item => {
+                const tag = document.createElement('span');
+                tag.className = 'text-[10px] bg-purple-900/60 text-purple-200 px-2 py-0.5 rounded-full border border-purple-700/50 flex items-center space-x-1';
+                tag.innerHTML = `<i class="fa-solid ${item.icon} text-[8px]"></i> <span>${item.name}</span>`;
+                container.appendChild(tag);
+            });
+        }
+
+        /* ------------------------------------------------------------------------
+         * 5. QUIZ INTERACTION & GAME LOGIC
+         * ------------------------------------------------------------------------ */
+        function renderQuestion() {
+            const q = quizData[currentQuestionIndex];
+            document.getElementById('questionTopic').textContent = q.topic;
+            document.getElementById('currentLabTitle').textContent = q.labTitle;
+            document.getElementById('questionProgress').textContent = `คำถามที่ ${currentQuestionIndex + 1} จาก ${quizData.length}`;
+            document.getElementById('questBadge').textContent = `ข้อ ${currentQuestionIndex + 1}`;
+            document.getElementById('chapterBadge').textContent = q.chapter;
+            document.getElementById('storyText').textContent = `"${q.story}"`;
+            document.getElementById('questionPrompt').textContent = q.question;
+            document.getElementById('rewardPreviewText').textContent = `รางวัลเมื่อตอบถูก: ${q.rewardName}`;
+
+            // Reset feedback banner & next button
+            const banner = document.getElementById('feedbackBanner');
+            banner.className = 'hidden rounded-2xl p-4 transition-all duration-300 flex items-start space-x-3';
+            
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = true;
+            nextBtn.className = 'px-5 py-2.5 rounded-xl font-medium text-sm bg-slate-800 text-slate-500 cursor-not-allowed transition-all duration-300 flex items-center space-x-2';
+
+            // Options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            const isAlreadyAnswered = answeredQuestions.has(currentQuestionIndex);
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3.5 rounded-xl glass-card border border-slate-700/60 hover:border-purple-500/60 hover:bg-slate-800/80 transition-all text-xs md:text-sm flex items-center justify-between group';
+                btn.innerHTML = `
+                    <span class="flex items-center space-x-2.5">
+                        <span class="w-6 h-6 rounded-lg bg-slate-800 group-hover:bg-purple-600 text-slate-300 group-hover:text-white flex items-center justify-center font-outfit text-xs font-bold transition">
+                            ${String.fromCharCode(65 + idx)}
+                        </span>
+                        <span>${opt.text}</span>
+                    </span>
+                    <i class="fa-solid fa-circle-check text-transparent group-hover:text-slate-600 transition"></i>
+                `;
+
+                if (!isAlreadyAnswered) {
+                    btn.onclick = () => selectAnswer(opt, btn, q);
+                } else {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-60', 'cursor-not-allowed');
+                }
+
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(selectedOpt, btnElement, questionObj) {
+            playSound('click');
+            answeredQuestions.add(currentQuestionIndex);
+
+            const allButtons = document.getElementById('optionsContainer').children;
+            for (let b of allButtons) {
+                b.disabled = true;
+                b.classList.add('cursor-not-allowed');
+            }
+
+            const banner = document.getElementById('feedbackBanner');
+            const icon = document.getElementById('feedbackIcon');
+            const title = document.getElementById('feedbackTitle');
+            const text = document.getElementById('feedbackText');
+
+            banner.classList.remove('hidden');
+
+            if (selectedOpt.correct) {
+                playSound('correct');
+                btnElement.className = 'w-full text-left p-3.5 rounded-xl bg-emerald-950/80 border-2 border-emerald-500 text-xs md:text-sm flex items-center justify-between';
+                
+                banner.classList.add('bg-emerald-950/90', 'border', 'border-emerald-500/50', 'text-emerald-200');
+                icon.className = 'fa-solid fa-circle-check text-emerald-400 text-xl';
+                title.textContent = 'คำตอบถูกต้อง! 🎉';
+                text.textContent = questionObj.explanation;
+
+                // Score & Rewards
+                score += 100;
+                document.getElementById('scoreDisplay').textContent = score;
+
+                // Unlock reward item
+                unlockItem(questionObj.unlockItemId, questionObj.rewardName);
+
+                // Trigger confetti FX
+                triggerConfetti();
+            } else {
+                playSound('wrong');
+                btnElement.className = 'w-full text-left p-3.5 rounded-xl bg-rose-950/80 border-2 border-rose-500 text-xs md:text-sm flex items-center justify-between';
+                
+                banner.classList.add('bg-rose-950/90', 'border', 'border-rose-500/50', 'text-rose-200');
+                icon.className = 'fa-solid fa-circle-xmark text-rose-400 text-xl';
+                title.textContent = 'ยังไม่ถูกต้อง';
+                text.textContent = `คำอธิบายเพิ่มเติม: ${questionObj.explanation}`;
+            }
+
+            // Enable Next Button
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = false;
+            nextBtn.className = 'px-5 py-2.5 rounded-xl font-medium text-sm bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg hover:brightness-110 transition-all duration-300 flex items-center space-x-2';
+        }
+
+        function unlockItem(itemId, rewardName) {
+            playSound('unlock');
+            let item = wardrobeDatabase.find(i => i.id === itemId);
+            if (item) {
+                item.unlocked = true;
+                // Auto equip newly unlocked item for instant visual feedback
+                if (item.category === 'gear') {
+                    if (!characterState.gear.includes(item.id)) {
+                        characterState.gear.push(item.id);
+                    }
+                } else {
+                    characterState[item.category] = item.id;
+                }
+                renderCharacterSVG();
+                updateUnlockedCountDisplay();
+                renderWardrobeGrid();
+            }
+        }
+
+        function nextQuestion() {
+            playSound('click');
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                // Game Finished - Open Completion Showcase
+                showCompletionModal();
+            }
+        }
+
+        function updateUnlockedCountDisplay() {
+            const unlockedTotal = wardrobeDatabase.filter(i => i.unlocked).length;
+            document.getElementById('unlockedCountDisplay').textContent = `${unlockedTotal}/${wardrobeDatabase.length}`;
+        }
+
+        /* ------------------------------------------------------------------------
+         * 6. WARDROBE INTERFACE & ITEM EQUIP SYSTEM
+         * ------------------------------------------------------------------------ */
+        function switchTab(tab) {
+            playSound('click');
+            activeTab = tab;
+            const quizPanel = document.getElementById('quizPanel');
+            const wardrobePanel = document.getElementById('wardrobePanel');
+            const tabQuizBtn = document.getElementById('tabQuizBtn');
+            const tabWardrobeBtn = document.getElementById('tabWardrobeBtn');
+
+            if (tab === 'quiz') {
+                quizPanel.classList.remove('hidden');
+                quizPanel.classList.add('flex');
+                wardrobePanel.classList.add('hidden');
+                wardrobePanel.classList.remove('flex');
+
+                tabQuizBtn.className = 'flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg';
+                tabWardrobeBtn.className = 'flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/60';
+            } else {
+                wardrobePanel.classList.remove('hidden');
+                wardrobePanel.classList.add('flex');
+                quizPanel.classList.add('hidden');
+                quizPanel.classList.remove('flex');
+
+                tabWardrobeBtn.className = 'flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg';
+                tabQuizBtn.className = 'flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800/60';
+                
+                renderWardrobeGrid();
+            }
+        }
+
+        function filterCategory(cat) {
+            playSound('click');
+            activeCategory = cat;
+            
+            // Highlight active Category Button
+            const buttons = document.querySelectorAll('.cat-btn');
+            buttons.forEach(btn => {
+                btn.className = 'cat-btn px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap bg-slate-800 text-slate-400 hover:text-white transition';
+            });
+            event.currentTarget.className = 'cat-btn px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap bg-purple-600 text-white transition shadow-md';
+
+            renderWardrobeGrid();
+        }
+
+        function renderWardrobeGrid() {
+            const grid = document.getElementById('wardrobeGrid');
+            grid.innerHTML = '';
+
+            const filteredItems = wardrobeDatabase.filter(i => i.category === activeCategory);
+
+            filteredItems.forEach(item => {
+                const isEquipped = item.category === 'gear' 
+                    ? characterState.gear.includes(item.id) 
+                    : characterState[item.category] === item.id;
+
+                const card = document.createElement('div');
+                card.className = `item-card rounded-2xl p-3 flex flex-col items-center justify-between text-center relative border transition cursor-pointer ${
+                    !item.unlocked 
+                        ? 'glass-card border-slate-800 opacity-60' 
+                        : isEquipped 
+                            ? 'bg-purple-950/80 border-pink-500 shadow-lg glow-pink' 
+                            : 'glass-card border-slate-700/60 hover:border-purple-500/50'
+                }`;
+
+                card.innerHTML = `
+                    <div class="w-10 h-10 rounded-xl ${isEquipped ? 'bg-pink-500 text-white' : 'bg-slate-800 text-purple-300'} flex items-center justify-center mb-2 text-lg">
+                        <i class="fa-solid ${item.icon}"></i>
+                    </div>
+                    <span class="text-xs font-medium text-slate-200 line-clamp-1">${item.name}</span>
+                    <span class="text-[10px] ${item.unlocked ? 'text-emerald-400' : 'text-amber-400'} mt-1">
+                        ${item.unlocked ? (isEquipped ? 'สวมใส่อยู่' : 'ปลดล็อกแล้ว') : item.unlockReq}
+                    </span>
+                    ${!item.unlocked ? '<div class="absolute top-2 right-2 text-amber-400 text-xs"><i class="fa-solid fa-lock"></i></div>' : ''}
+                `;
+
+                card.onclick = () => toggleEquipItem(item);
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleEquipItem(item) {
+            if (!item.unlocked) {
+                playSound('wrong');
+                alert(`ไอเทมนี้ล็อคอยู่: ${item.unlockReq}`);
+                return;
+            }
+
+            playSound('click');
+            if (item.category === 'gear') {
+                const index = characterState.gear.indexOf(item.id);
+                if (index > -1) {
+                    characterState.gear.splice(index, 1); // Unequip
+                } else {
+                    characterState.gear.push(item.id); // Equip
+                }
+            } else {
+                characterState[item.category] = item.id;
+            }
+
+            renderCharacterSVG();
+            renderWardrobeGrid();
+        }
+
+        function resetOutfit() {
+            playSound('click');
+            characterState = {
+                hair: 'hair_default',
+                top: 'top_casual',
+                bottom: 'bottom_skirt',
+                shoes: 'shoes_sneakers',
+                gear: [],
+                bg: 'bg_lab'
+            };
+            renderCharacterSVG();
+            renderWardrobeGrid();
+        }
+
+        /* ------------------------------------------------------------------------
+         * 7. PARTICLE CONFETTI FX & COMPLETION SHOWCASE MODAL
+         * ------------------------------------------------------------------------ */
+        function triggerConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#8b5cf6', '#ec4899', '#06b6d4', '#10b981', '#f59e0b'];
+
+            for (let i = 0; i < 80; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.7) * 14,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 4,
+                    rotation: Math.random() * 360,
+                    life: 100
+                });
+            }
+
+            function animateConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+
+                particles.forEach(p => {
+                    if (p.life > 0) {
+                        alive = true;
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.3; // Gravity
+                        p.life -= 1.5;
+
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate((p.rotation * Math.PI) / 180);
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                        ctx.restore();
+                    }
+                });
+
+                if (alive) {
+                    requestAnimationFrame(animateConfetti);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            animateConfetti();
+        }
+
+        function showCompletionModal() {
+            playSound('unlock');
+            triggerConfetti();
+
+            const modal = document.getElementById('completionModal');
+            modal.classList.remove('hidden');
+
+            // Clone Character SVG for Showcase
+            const characterStage = document.getElementById('characterStage').cloneNode(true);
+            const previewContainer = document.getElementById('finalAvatarPreview');
+            previewContainer.innerHTML = '';
+            previewContainer.appendChild(characterStage);
+
+            // Calculate Title and Item %
+            const unlockedTotal = wardrobeDatabase.filter(i => i.unlocked).length;
+            const percent = Math.round((unlockedTotal / wardrobeDatabase.length) * 100);
+
+            document.getElementById('finalScore').textContent = `${score} / ${quizData.length * 100}`;
+            document.getElementById('finalItemPercent').textContent = `${percent}% ปลดล็อกทั้งหมด (${unlockedTotal}/${wardrobeDatabase.length})`;
+
+            let title = "Cyber Scientist Stylist";
+            if (score === 500) title = "🏆 Master Sci-Fashion Quantum Director";
+            else if (score >= 300) title = "✨ High-School Quantum Researcher";
+            document.getElementById('earnedTitle').textContent = title;
+        }
+
+        function restartGame() {
+            playSound('click');
+            score = 0;
+            currentQuestionIndex = 0;
+            answeredQuestions.clear();
+            document.getElementById('scoreDisplay').textContent = score;
+
+            // Reset Locks for unlocked ones from quiz
+            wardrobeDatabase.forEach(item => {
+                if (item.unlockReq) item.unlocked = false;
+            });
+
+            resetOutfit();
+            updateUnlockedCountDisplay();
+            document.getElementById('completionModal').classList.add('hidden');
+            switchTab('quiz');
+            renderQuestion();
+        }
+
+        function downloadSnapshot() {
+            playSound('click');
+            alert('📸 บันทึกภาพแฟชั่นนักวิจัยของคุณเรียบร้อย! (คุณสามารถแคปหน้าจอนี้เพื่อนำไปแชร์ต่อได้เลย)');
+        }
+
+        /* ------------------------------------------------------------------------
+         * 8. APPLICATION INITIALIZATION
+         * ------------------------------------------------------------------------ */
+        window.onload = function() {
+            renderCharacterSVG();
+            renderQuestion();
+            updateUnlockedCountDisplay();
+            renderWardrobeGrid();
+        };
+    </script>
 </body>
 </html>
